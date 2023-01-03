@@ -1,0 +1,29 @@
+@(collect: Collect, modules: Modules, form: Form[_root_.modules.exporter.postgresql.PostgresConfiguration])(implicit request: MessagesRequestHeader)
+
+@import models.{Collect, Modules}
+
+@main("Modules") {
+    <h1>Modules for the collect @collect.name</h1>
+
+    <h2>PostgreSQL Exporter</h2>
+
+    @if(modules.postgresExporterConfiguration.isEmpty){
+        @views.html.modules.postgresExporterForm(collect.name, form, controllers.routes.ModuleController.addPostgresConfiguration(collect.name))
+        <a href="#postgres_exporter_form" id="postgres_exporter_form_pop_add">Add PostgreSQL Exporter</a>
+    } else {
+        @if(modules.postgresExporterModule.isDefined){
+            @helper.form(routes.ModuleController.stopPostgresExporterModule(collect.name)) {
+                @helper.CSRF.formField
+                <button>Stop module</button>
+            }
+        } else {
+            @helper.form(routes.ModuleController.startPostgresExporterModule(collect.name)) {
+                @helper.CSRF.formField
+                <button>Start module</button>
+            }
+
+            @views.html.modules.postgresExporterForm(collect.name, form, controllers.routes.ModuleController.updatePostgresConfiguration(collect.name))
+            <a href="#postgres_exporter_form" id="postgres_exporter_form_pop_update">Update PostgreSQL Exporter</a>
+        }
+    }
+}

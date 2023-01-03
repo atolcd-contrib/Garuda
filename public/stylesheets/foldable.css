@@ -1,0 +1,58 @@
+body {
+  background-color: #eee;
+}
+
+table {
+  margin: 16px 0;
+}
+
+td {
+  font-size: 16px;
+
+}
+
+.date {
+  font-size: 10px;
+}
+
+i {
+  margin-top: -2px;
+  float: left;
+}
+
+p {
+  margin: 12px 0;
+}
+
+.card {
+  /*max-width: 350px;*/
+  border-radius: 4px;
+  /*margin: 20px auto 20px 50px;*/
+  /*margin: auto auto auto auto;*/
+  top: 10px;
+  display: block;
+  overflow: hidden;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,.45);
+  font-family: 'Roboto';
+  color: #444;
+  font-size: 14px;
+  background-color: white;
+  text-decoration: none;
+  max-height: 47px;
+  transition: all 1s ease;
+}
+
+.content {
+	margin: 0 16px;
+}
+.active {
+	transition: all 1.2s ease;
+  max-height: 90000px;
+}
+.active .content p {
+  display: block;
+  max-height: 900px;
+}
+.content p:first-child {
+  margin: 12px 0;
+}

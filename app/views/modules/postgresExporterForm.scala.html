@@ -1,0 +1,22 @@
+@(collectName: String,  form: Form[_root_.modules.exporter.postgresql.PostgresConfiguration], postUrl: Call)(implicit request: MessagesRequestHeader)
+
+<a href="#x" class="overlay" id="postgres_exporter_form"></a>
+<div class="popup">
+    <h2>PostgreSQL Exporter Module</h2>
+    <div>
+        @helper.form(postUrl) {
+            @helper.CSRF.formField
+
+            <input id="Collect" name="Collect" type="hidden" value="@{collectName}">
+            @helper.inputText(form("Host"))
+            @helper.inputText(form("Port"))
+            @helper.inputText(form("Base"))
+            @helper.inputText(form("Schema"))
+            @helper.inputText(form("User"))
+            @helper.inputPassword(form("Password"))
+
+            <button>Add module</button>
+        }
+        <a class="close" href="#close"></a>
+    </div>
+</div>

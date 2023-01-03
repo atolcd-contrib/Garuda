@@ -1,0 +1,35 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# https://www.playframework.com/documentation/latest/ScalaRouting
+# ~~~~
+
+# An example controller showing a sample home page
+GET     /                                           controllers.HomeController.index()
+
+# Accounts
+GET     /accounts                                   controllers.AccountController.listAccounts
+POST    /accounts                                   controllers.AccountController.createAccount
+POST    /accounts/:accountName/remove               controllers.AccountController.removeAccount(accountName: String)
+POST    /accounts/:accountName/update               controllers.AccountController.updateAccount(accountName: String)
+
+# Collects
+GET     /collects                                   controllers.CollectController.listCollects
+POST    /collects                                   controllers.CollectController.createCollect
+GET		/collects/:collectName		                controllers.CollectController.seeCollect(collectName: String)
+POST    /collects/:collectName                      controllers.CollectController.createRule(collectName: String)
+POST    /collects/:collectName/affectRules          controllers.CollectController.affectRules(collectName: String)
+POST    /collects/:collectName/removeAccountRules   controllers.CollectController.removeAccountRules(collectName: String)
+POST    /collects/:collectName/start                controllers.CollectController.startCollect(collectName: String)
+POST    /collects/:collectName/stop                 controllers.CollectController.stopCollect(collectName: String)
+POST    /collects/:collectName/remove               controllers.CollectController.removeCollect(collectName: String)
+POST    /collects/:collectName/update               controllers.CollectController.updateCollect(collectName: String)
+
+# Modules
+GET     /modules/:collectName                       controllers.ModuleController.seeModules(collectName: String)
+POST    /modules/:collectName/addPGC                controllers.ModuleController.addPostgresConfiguration(collectName: String)
+POST    /modules/:collectName/updatePGC             controllers.ModuleController.updatePostgresConfiguration(collectName: String)
+POST    /modules/:collectName/startPGE              controllers.ModuleController.startPostgresExporterModule(collectName: String)
+POST    /modules/:collectName/stopPGE               controllers.ModuleController.stopPostgresExporterModule(collectName: String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file                               controllers.Assets.versioned(path="/public", file: Asset)

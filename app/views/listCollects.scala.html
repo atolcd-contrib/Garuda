@@ -1,0 +1,45 @@
+@(collects: Seq[Collect], accounts: Seq[Account], form: Form[models.CollectForm.CollectData], postUrl: Call)(implicit request: MessagesRequestHeader)
+
+@import models.Account
+@import models.Collect
+@import models.CollectForm.CollectData
+
+@main("Collects") {
+
+    <h1>Collects</h1>
+
+    <ul>
+        @for(collect <- collects) {
+            <li>
+                <a href="@routes.CollectController.seeCollect(collect.name)">@collect.name</a>@{if (collect.isActive) ", active" else ""}
+                @if(!collect.isActive){
+                    @helper.form(routes.CollectController.removeCollect(collect.name)) {
+                        @helper.CSRF.formField
+                        <button>Remove collect</button>
+                    }
+                }
+            </li>
+        }
+    </ul>
+
+    <h2>Add a collect</h2>
+
+    @* Global errors are not tied to any particular form field *@
+    @if(form.hasGlobalErrors) {
+        @form.globalErrors.map { error: FormError =>
+            <div>
+                @error.key: @error.message
+            </div>
+        }
+    }
+
+    @helper.form(postUrl) {
+        @helper.CSRF.formField
+
+        @helper.inputText(form("Name"))
+
+        @helper.select(form("Account"), accounts.map(a => (a.name, a.name)))
+
+        <button>Add collect</button>
+    }
+}

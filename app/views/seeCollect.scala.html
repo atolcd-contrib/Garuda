@@ -1,0 +1,334 @@
+@(collect: Collect, account: Account, accounts: Seq[Account], form: Form[models.TemporaryRuleForm.TemporaryRuleData],
+postCreateRuleUrl: Call, postAffectRulesUrl: Call, postRemoveAccountRulesUrl: Call,
+csrfToken: String)(implicit request: MessagesRequestHeader)
+
+@import models.Account
+@import models.Collect
+@import models.CollectForm.CollectData
+@import models.Rule
+@import models.TemporaryRule
+@import models.TemporaryRuleForm.TemporaryRuleData
+
+@displayTwitterError(message: String) = {
+    <div>
+        <h3>Account active rules</h3>
+        <p>Display the rules of the account that are registered at Twitter but that are not part of the collect.</p>
+        <p>Cannot contact Twitter API: <br /> @message</p>
+    </div>
+}
+
+@displayAccountActiveRules(rules: Seq[Rule]) = {
+    @if(!rules.isEmpty){
+        <div>
+            <h3>Account active rules</h3>
+            <p>Display the rules of the account that are registered at Twitter but that are not part of the collect.</p>
+            <table id="account_rules">
+                @for(rule <- rules) {
+                    <tr id=@{rule.id}>
+                        <td>@rule.tag</td>
+                        <td>@rule.content</td>
+                    </tr>
+                }
+            </table>
+            <input type="button" name="select_all_account_rules" class="select_all_account_rules" value="Select all" style="left: 50%"/>
+            <input type="button" name="remove_selected_account_rules" class="remove_selected_account_rules" value="Remove selected rules" style="left: 50%"/>
+        </div>
+    } else {
+        <div></div>
+    }
+}
+
+@displayActiveRules(rules: Seq[Rule]) = {
+    <div style="width: 50%; float: left">
+        <h3>Active rules</h3>
+        <table id="active_rules">
+            <thead>
+                <tr>
+                    <th>Current status</th>
+                    <th>Tag</th>
+                    <th>Rule content</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(rule <- rules) {
+                    <tr id=@{"a-"+rule.id}>
+                        <td>Active rule</td>
+                        <td>@rule.tag</td>
+                        <td>@rule.content</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@displayNonActiveRules(rules: Seq[Rule], temporaryRules: Seq[TemporaryRule]) = {
+    <div style="width: 50%; float: left">
+        <h3>Non-active rules</h3>
+        <table id="non_active_rules">
+            <thead>
+                <tr>
+                    <th>Current status</th>
+                    <th>Tag</th>
+                    <th>Rule content</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(rule <- rules) {
+                    <tr id=@{"n-"+rule.id}>
+                        <td>Non-active rule</td>
+                        <td>@rule.tag</td>
+                        <td>@rule.content</td>
+                    </tr>
+                }
+                @for(rule <- temporaryRules) {
+                    <tr id=@{"t-"+rule.id.get}>
+                        <td>Non-active rule</td>
+                        <td>@rule.tag</td>
+                        <td>@rule.content</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@script = {
+    <style type="text/css">
+        td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
+
+        .selected {
+            background-color: brown;
+            color: #FFF;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function affectRules() {
+            var activeLength = document.getElementById("active_rules").rows.length;
+            var activeRules = [];
+            for (let i = 1; i < activeLength; i++) {
+                activeRules[i] = document.getElementById("active_rules").rows[i].id;
+            }
+
+            var nonActiveLength = document.getElementById("non_active_rules").rows.length;
+            var nonActiveRules = [];
+            for (let i = 1; i < nonActiveLength; i++) {
+                nonActiveRules[i] = document.getElementById("non_active_rules").rows[i].id;
+            }
+            data = {};
+            data.csrfToken = "@csrfToken";
+            data.active_ids = activeRules;
+            data.non_active_ids = nonActiveRules;
+
+            post('@postAffectRulesUrl', data)
+        }
+
+        function removeAccountRules() {
+            var activeLength = document.getElementById("account_rules").rows.length;
+            var activeRules = [];
+            for (let i = 0; i < activeLength; i++) {
+                if (document.getElementById("account_rules").rows[i].classList.contains('selected')) {
+                    activeRules[i] = document.getElementById("account_rules").rows[i].id;
+                }
+            }
+            data = {};
+            data.csrfToken = "@csrfToken";
+            data.account_rules_ids = activeRules;
+            data.number_of_rules_to_remove = activeRules.length;
+
+            post('@postRemoveAccountRulesUrl', data)
+        }
+
+        function post(path, params, method='post') {
+            const form = document.createElement('form');
+            form.method = method;
+            form.action = path;
+
+            for (const key in params) {
+                if (params.hasOwnProperty(key)) {
+                    const hiddenField = document.createElement('input');
+                    hiddenField.type = 'hidden';
+                    hiddenField.name = key;
+                    hiddenField.value = params[key];
+
+                    form.appendChild(hiddenField);
+                }
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        $("table tbody tr").click(function(){
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            } else {
+                $(this).addClass('selected');
+            }
+        });
+
+        $('.select_all_active').on('click', function(e) {
+            $("#active_rules tbody tr").removeClass('selected');
+            $("#active_rules tbody tr").addClass('selected');
+        });
+
+        $('.select_all_non_active').on('click', function(e) {
+            $("#non_active_rules tbody tr").removeClass('selected');
+            $("#non_active_rules tbody tr").addClass('selected');
+        });
+
+        $('.select_all_account_rules').on('click', function(e) {
+            $("#account_rules tbody tr").addClass('selected');
+        });
+
+        function moveRows(from_table_id, to_table_id) {
+            var rows = document.getElementById(from_table_id).getElementsByClassName('selected');
+            var oldLength = document.getElementById(to_table_id).rows.length;
+            for (let i = rows.length - 1; i >= 0; i--) {
+                document.getElementById(to_table_id).appendChild(rows[i]);
+            }
+            var newLength = document.getElementById(to_table_id).rows.length;
+            for (let i = oldLength; i < newLength; i++) {
+                document.getElementById(to_table_id).rows[i].classList.remove('selected');
+            }
+        }
+
+        $('.move_active_rules').on('click',function(e) {
+            moveRows("active_rules", "non_active_rules");
+        });
+
+        $('.move_non_active_rules').on('click', function(e) {
+            moveRows("non_active_rules", "active_rules");
+        });
+
+        $('.remove_selected_account_rules').on('click', function(e) {
+            removeAccountRules();
+        });
+
+        $('.affect_rules').on('click', function(e) {
+            var activeLength = document.getElementById("active_rules").rows.length - 1;
+            var maxNumberOfRules = @account.accountType.numberOfRules;
+            if (activeLength > maxNumberOfRules) {
+                alert(`Too many active rules. With an account of type "@account.accountType.name", only $maxNumberOfRules can be active.`);
+            } else {
+                affectRules();
+            }
+        });
+
+        $("textarea").keydown(function(e){
+            // Enter was pressed
+            if (e.keyCode == 13) {
+                // prevent default behavior
+                e.preventDefault();
+            }
+        });
+    </script>
+}
+
+@main(s"Collect ${collect.name}", script) {
+    <h1>Collect @{collect.name}</h1>
+
+    <a href="@routes.ModuleController.seeModules(collect.name)">Modules</a>
+
+    @if(collect.isActive) {
+        @helper.form(routes.CollectController.stopCollect(collect.name)) {
+            @helper.CSRF.formField
+            <button>Stop collect</button>
+        }
+    }else{
+        @if(account.currentActiveCollect.isEmpty){
+            @if(!collect.activeRules.isEmpty){
+                @helper.form(routes.CollectController.startCollect(collect.name)) {
+                    @helper.CSRF.formField
+                    <button>Start collect</button>
+                }
+            }
+        }else{
+            The collect "@account.currentActiveCollect.get.collect.name" is already running with the same Twitter account.
+        }
+    }
+
+    <h2>Parameters</h2>
+        <li>
+            <ul>Directory: @collect.directory</ul>
+            <ul>
+                Account: @collect.account <br />
+                @if(!collect.isActive){
+                    <a href="#update_account_form" id="update_account_form_pop">Update account</a>
+                    <!-- popup update account -->
+                    <a href="#x" class="overlay" id="update_account_form"></a>
+                    <div class="popup">
+                        <h2>Update account</h2>
+                        <div>
+                            @helper.form(controllers.routes.CollectController.updateCollect(collect.name)) {
+                                @helper.CSRF.formField
+                                <input id="Name" name="Name" type="hidden" value="@{collect.name}">
+                                @helper.select(form("Account").copy(value = Option(account.name)), accounts.map(a => (a.name, a.name)))
+                                <input type="submit" value="Update account">
+                            }
+                            <a class="close" href="#close"></a>
+                        </div>
+                    </div>
+                }
+            </ul>
+        </li>
+
+    <h2>Rules</h2>
+
+    @account.initRules(collect.name).fold(displayTwitterError(_), _ =>
+displayAccountActiveRules(account.rules.get.filter(rule => !collect.activeRules.map(r => r.id).contains(rule.id))))
+
+    <div style="width: 100%">
+        @displayActiveRules(collect.activeRules)
+
+        @displayNonActiveRules(collect.nonActiveRules, collect.temporaryRules.get)
+
+        <div style="clear: both">
+            @if(collect.rules.isDefined || collect.temporaryRules.isDefined) {
+                <input type="button" name="move_active_rules" class="move_active_rules" value=">>" style="position: absolute; left: 45%"/>
+                <input type="button" name="select_all_active" class="select_all_active" value="Select all" style="position: absolute; left: 40%"/>
+
+                <input type="button" name="move_non_active_rules" class="move_non_active_rules" value="<<" style="position: absolute; left: 55%"/>
+                <input type="button" name="select_all_non_active" class="select_all_non_active" value="Select all" style="position: absolute; left: 60%"/>
+            }
+        </div>
+        <div style="clear: both">
+            @if(account.rules.isDefined) {
+                <input type="button" name="affect_rules" class="affect_rules" value="Affect rules"/>
+            }
+        </div>
+    </div>
+
+    <div style="clear: both">
+        <h2>Add a rule</h2>
+
+        @* Global errors are not tied to any particular form field *@
+        @if(form.hasGlobalErrors) {
+            @form.globalErrors.map { error: FormError =>
+                <div>
+                    @error.key: @error.message
+                </div>
+            }
+        }
+
+        @helper.form(postCreateRuleUrl) {
+            @helper.CSRF.formField
+
+            @helper.inputText(form("Tag"))
+
+            @helper.textarea(form("Content"), args = Symbol("maxlength") -> account.accountType.sizeOfRule)
+
+            <button>Add Rule</button>
+        }
+    </div>
+
+    <style type="text/css">
+        td {border: 1px #DDD solid; padding: 5px; cursor: pointer;}
+
+        .selected {
+            background-color: brown;
+            color: #FFF;
+        }
+    </style>
+}

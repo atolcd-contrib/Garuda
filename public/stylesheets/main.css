@@ -1,0 +1,12 @@
+@import 'foldable.css';
+@import 'notification.css';
+@import 'popup.css';
+@import 'menu.css';
+
+.running {
+	color: green;
+}
+
+.stop {
+	color: red;
+}

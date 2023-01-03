@@ -1,0 +1,72 @@
+@*
+ * This template is called from the `index` template. This template
+ * handles the rendering of the page header and body tags. It takes
+ * two arguments, a `String` for the title of the page and an `Html`
+ * object to insert into the body of the page.
+ *@
+@(title: String, script: Html = Html(""))(content: Html)(implicit request: MessagesRequestHeader = null)
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        @* Here's where we render the page title `String`. *@
+        <title>@title</title>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+    </head>
+    <body>
+        @* Flash shows updates to a page *@
+        @if(request != null){
+            @request.flash.data.map{ case (key, message) =>
+                @if(key == "warn"){
+                    <div class="container">
+                        <div class="notification notif-danger">
+                            <span class="notification-close">&times;</span>
+                            <h3 class="notification-title">Warning</h3>
+                            <p class="notification-message">@{message}</p>
+                        </div>
+                    </div>
+                }else if(key == "success"){
+                    <div class="container">
+                        <div class="notification notif-success">
+                            <span class="notification-close">&times;</span>
+                            <h3 class="notification-title">Success</h3>
+                            <p class="notification-message">@{message}</p>
+                        </div>
+                    </div>
+                }else if(key == "info"){
+                    <div class="container">
+                        <div class="notification notif-info">
+                            <span class="notification-close">&times;</span>
+                            <h3 class="notification-title">Info</h3>
+                            <p class="notification-message">@{message}</p>
+                        </div>
+                    </div>
+                }else if(key == "error"){
+                    <div class="container">
+                        <div class="notification notif-warning">
+                            <span class="notification-close">&times;</span>
+                            <h3 class="notification-title">Error</h3>
+                            <p class="notification-message">@{message}</p>
+                        </div>
+                    </div>
+                }
+            }
+        }
+
+        <nav>
+            <ul>
+                <li><a href="@routes.AccountController.listAccounts">Accounts</a></li>
+                <li><a href="@routes.CollectController.listCollects">Collects</a></li>
+            </ul>
+        </nav>
+
+        @* And here's where we render the `Html` object containing
+         * the page content. *@
+        @content
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="@routes.Assets.versioned("javascripts/main.js")" type="text/javascript"></script>
+        @script
+    </body>
+</html>

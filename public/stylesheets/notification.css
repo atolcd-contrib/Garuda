@@ -1,0 +1,65 @@
+* .container {
+  position: relative;
+  margin: 5px auto 5px;
+  width: 95%;
+}
+.notification {
+  max-width: 100%;
+  width: 100%;
+  border-radius: 6px;
+  box-shadow: 0.0625rem 0.0625rem 0.0925rem #2d794b;
+  padding: 20px;
+  margin: 10px auto;
+  position: relative;
+}
+.notification .notification-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  border-radius: 50px;
+  width: 18px;
+  height: 18px;
+  line-height: 15px;
+  text-align: center;
+}
+.notification .notification-title,
+.notification .notification-message {
+  color: #fff;
+  font-family: 'Open Sans', sans-serif;
+}
+.notification .notification-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+.notification .notification-message {
+  font-weight: 400;
+  font-size: 14px;
+}
+.notif-success {
+  background: #5ed490;
+}
+.notif-success .notification-close {
+  border: 1px solid #2d794b;
+  color: #2d794b;
+}
+.notif-warning {
+  background: #f56668;
+}
+.notif-warning .notification-close {
+  border: 1px solid #ba4849;
+  color: #ba4849;
+}
+.notif-info {
+  background: #2a7ac0;
+}
+.notif-info .notification-close {
+  border: 1px solid #08345b;
+}
+.notif-danger {
+  background: #e5a300;
+}
+.notif-danger .notification-close {
+  border: 1px solid #996d00;
+}
