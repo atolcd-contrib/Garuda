@@ -49,3 +49,8 @@ Several improvements are on the roadmap:
 - add a module to monitor a collect and see how many tweets are collected;
 - add a module to extract tweets of a collect into a CSV file;
 - add a helper to define rules.
+
+## Additional Documentation
+
+See the following page:
+* [DEVELOPMENT.md]() to start developpement (compile and run from source)
