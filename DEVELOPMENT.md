@@ -112,3 +112,18 @@ Click `Modules` to access to the modules page of the collect [localhost:9000/mod
 - Click `Start module`
 
 💡 It begins to insert data from file in `Collects/collect1` to PostgreSQL database.
+
+## Quickly check activity
+
+Run the following command to count tweets of last 10 months:
+```sh
+docker exec -it garuda-postgres-1 sh -c "psql -U garuda -d garuda <<EOF
+
+SELECT DATE_TRUNC('month',created_at::timestamp), COUNT(1) AS count
+FROM garuda.tweet
+GROUP BY DATE_TRUNC('month', created_at::timestamp)
+order by DATE_TRUNC('month',created_at::timestamp) desc
+limit 10;
+
+EOF"
+```
