@@ -3,7 +3,7 @@ organization := "io.github.annabellegillet"
 
 version := "1.0"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val root = (project in file(".")).enablePlugins(PlayScala, PackPlugin)
 
 scalaVersion := "2.13.10"
 
