@@ -45,4 +45,70 @@ Wait for server to run and open [localhost:9000]()
 
 💡 At this step, schema tables are created in `garudadef` database.
 
-You can follow instructions of [README.md]() to set up a collect.
+To set up a collect, you can follow instructions:
+* of [README.md]()
+* of the next paragraph
+
+## Insert a dataset
+
+Next, we insert a minimal dataset with a rule.
+
+⚠ At least think about defining `GARUDA_ACCOUNT_TYPE`, `GARUDA_ACCOUNT_NAME`, `GARUDA_ACCOUNT_BEARER_TOKEN` and `GARUDA_RULE_CONTENT` before execution:
+
+```sh
+export GARUDA_DIRECTORY="Collects"
+
+# Essential, Elevated, Academic
+export GARUDA_ACCOUNT_TYPE="${GARUDA_ACCOUNT_TYPE:-Essential}"
+export GARUDA_ACCOUNT_NAME="${GARUDA_ACCOUNT_NAME:-SetIt}"
+export GARUDA_ACCOUNT_BEARER_TOKEN="${GARUDA_ACCOUNT_BEARER_TOKEN:-SetIt}"
+
+export GARUDA_COLLECT_NAME="collect1"
+export GARUDA_PG_HOST="localhost"
+export GARUDA_PG_PORT="5432"
+export GARUDA_PG_BASE="garuda"
+export GARUDA_PG_SCHEMA="${GARUDA_PG_SCHEMA:-garuda}"
+export GARUDA_PG_USER="garuda"
+export GARUDA_PG_PASSWORD="garuda"
+
+# ⚠ tag label and content rule
+export GARUDA_RULE_TAG="My tag label to identify which rules have matched"
+# See https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
+export GARUDA_RULE_CONTENT="${GARUDA_RULE_CONTENT:-Garuda AND (Kashyapa OR Vinatâ)}"
+
+docker exec -it garuda-postgres-1 sh -c "psql -U garudadef -d garudadef <<EOF
+
+BEGIN;
+
+INSERT INTO PUBLIC."account"
+("name", "type", "bearer_token")
+VALUES('${GARUDA_ACCOUNT_NAME}', '${GARUDA_ACCOUNT_TYPE}', '${GARUDA_ACCOUNT_BEARER_TOKEN}');
+
+INSERT INTO PUBLIC."collect"
+("name", "directory", "account")
+VALUES('${GARUDA_COLLECT_NAME}', '${GARUDA_DIRECTORY}/${GARUDA_COLLECT_NAME}', '${GARUDA_ACCOUNT_NAME}');
+
+INSERT INTO PUBLIC."postgres_configuration"
+("collect", "host", "port", "base", "schema_", "user_", "password")
+VALUES('${GARUDA_COLLECT_NAME}', '${GARUDA_PG_HOST}', ${GARUDA_PG_PORT}, '${GARUDA_PG_BASE}', '${GARUDA_PG_SCHEMA}', '${GARUDA_PG_USER}', '${GARUDA_PG_PASSWORD}');
+
+INSERT INTO PUBLIC."temporary_rule"
+("tag", "content", "collect")
+VALUES('${GARUDA_RULE_TAG}', '${GARUDA_RULE_CONTENT}', '${GARUDA_COLLECT_NAME}');
+
+COMMIT;
+EOF"
+```
+
+In the collect page [localhost:9000/collects/collect1]():
+- Remove rules of the account that are registered at Twitter but that are not part of the collect:
+  - Click `Select all` and `Remove all selected rules`
+- Select rule, switch to active with `<<` and click `Affect rules`
+- Click `Start collect`
+
+💡 It begins to collect data from twitter to files in `Collects/collect1/***` directory.
+
+Click `Modules` to access to the modules page of the collect [localhost:9000/modules/collect1]():
+- Click `Start module`
+
+💡 It begins to insert data from file in `Collects/collect1` to PostgreSQL database.
