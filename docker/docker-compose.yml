@@ -1,0 +1,28 @@
+name: garuda
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_USER: garuda
+      POSTGRES_PASSWORD: garuda
+      POSTGRES_DB: garuda
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    logging:
+      options:
+        max-size: "10k"
+        max-file: "20"
+    networks:
+      garuda:
+
+volumes:
+  postgres:
+    name: 'garuda-postgres'
+
+networks:
+  garuda:
+    name: 'garuda'

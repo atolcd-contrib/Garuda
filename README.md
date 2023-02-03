@@ -52,5 +52,6 @@ Several improvements are on the roadmap:
 
 ## Additional Documentation
 
-See the following page:
+See the following pages:
 * [DEVELOPMENT.md]() to start developpement (compile and run from source)
+* [docker/README.md]() to run dependencies (ie: PostgreSQL database)

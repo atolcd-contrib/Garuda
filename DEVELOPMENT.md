@@ -4,7 +4,15 @@ Commands are executed in the project's root directory.
 
 ## Preriquisites
 
-You only need [docker engine 19.03.0+](https://docs.docker.com/get-docker/).
+You only need [docker engine 19.03.0+](https://docs.docker.com/get-docker/) and [docker-compose 1.27.0+](https://docs.docker.com/compose/install/).
+
+## Dependencies
+
+Cf. [docker/README.md]().
+
+```sh
+(cd docker && docker-compose up --force-recreate -d)
+```
 
 ## Compile and run
 
