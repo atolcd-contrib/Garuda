@@ -35,3 +35,29 @@ export GARUDA_OPTS=(-Dslick.dbs.default.profile="slick.jdbc.PostgresProfile$" -D
 # Note : sdk.properties file and public directory are needed in classpath
 java $GARUDA_OPTS -cp ".:target/pack/lib/*" play.core.server.ProdServerStart
 ```
+
+## Package `docker` image
+
+After having packaged the application as a jar (see previous paragraph), build docker image:
+```sh
+docker build . -f docker/garuda/Dockerfile -t garuda:latest
+```
+
+**Example execution with docker** and `garuda-postgres-1` started:
+
+```sh
+# Directories created before to avoid root owner at auto creation by bind mount with a non root container
+#mkdir -p somewhere/{collects,logs} &&\
+docker run --rm --name garuda-example \
+  --network host \
+  -u $(id -u):$(id -g) \
+  `#-v "$(pwd)/somewhere/collects":"/opt/garuda/Collects"` \
+  `#-v "$(pwd)/somewhere/logs":"/opt/garuda/logs"` \
+  -e JAVA_OPTS="\
+    -Dplay.http.secret.key=\"think-about-changing-this-key\" \
+    -Dgaruda.directory=\"Collects\" \
+    -Dslick.dbs.default.db.url=jdbc:postgresql://localhost:5432/garudadef?user=garudadef&password=garudadef\
+  " \
+  \
+  garuda:latest
+```

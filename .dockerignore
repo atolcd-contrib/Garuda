@@ -1,0 +1,5 @@
+*
+!docker/garuda/docker-entrypoint.sh
+!public/
+!target/pack/lib/
+!sdk.properties

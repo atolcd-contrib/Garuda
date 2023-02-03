@@ -55,4 +55,4 @@ Several improvements are on the roadmap:
 See the following pages:
 * [DEVELOPMENT.md]() to start developpement (compile and run from source)
 * [docker/README.md]() to run dependencies (ie: PostgreSQL database)
-* [PACKAGING.md]() to package application (ie: jar files)
+* [PACKAGING.md]() to package application (ie: `jar` files or `docker` image)
