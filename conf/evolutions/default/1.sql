@@ -2,7 +2,7 @@
 
 CREATE TABLE account (
     name VARCHAR(255) PRIMARY KEY,
-    type ENUM('Essential', 'Elevated', 'Academic') NOT NULL,
+    type VARCHAR(9) NOT NULL check (type in ('Essential', 'Elevated', 'Academic')),
     bearer_token TEXT NOT NULL
 );
 
@@ -23,7 +23,7 @@ CREATE TABLE rule (
 );
 
 CREATE TABLE temporary_rule (
-    id BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    id BIGSERIAL NOT NULL PRIMARY KEY,
     tag TEXT NOT NULL,
     content TEXT NOT NULL,
     collect VARCHAR(255) NOT NULL REFERENCES collect(name),
