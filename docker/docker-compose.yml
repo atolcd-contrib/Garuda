@@ -10,6 +10,8 @@ services:
       POSTGRES_DB: garuda
     volumes:
       - postgres:/var/lib/postgresql/data
+      # Creates garudadef user and database
+      - ./postgres/garudadef-user-database.sql:/docker-entrypoint-initdb.d/init1.sql
     ports:
       - "5432:5432"
     logging:

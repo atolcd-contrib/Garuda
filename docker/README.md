@@ -26,7 +26,8 @@ docker compose down --remove-orphans --volumes --rmi local
 ### PostgreSQL Server
 `garuda-postgres-1` container exposes a **PostgreSQL server** that listens on port `5432`.
 
-One database is created :
+Two databases are created :
+* `garudadef` : used to define collects
 * `garuda` : target database which will receive tweets, etc.
 
 ```sh
